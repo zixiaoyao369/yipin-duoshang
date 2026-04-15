@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>一品多商</title>
+<script>
+  // GitHub Pages SPA redirect
+  // Redirects all 404s to the SPA index, preserving the path
+  var seg = window.location.pathname.split('/');
+  // Check if the path starts with /yipin-duoshang/产品原型/
+  var base = '/yipin-duoshang/';
+  var protoBase = base + '产品原型/';
+  if (window.location.pathname.indexOf(protoBase) === 0) {
+    // Redirect to prototype SPA
+    var query = '?p=' + encodeURIComponent(window.location.pathname.slice(protoBase.length)) + (window.location.search ? '&q=' + encodeURIComponent(window.location.search.slice(1)) : '') + window.location.hash;
+    window.location.replace(protoBase + query);
+  } else {
+    // Redirect to portal
+    window.location.replace(base);
+  }
+</script>
+</head>
+<body></body>
+</html>
