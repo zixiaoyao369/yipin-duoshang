@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一品多商 - 产品原型</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+  }
+  .card {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 48px 56px;
+    text-align: center;
+    max-width: 480px;
+  }
+  h1 { font-size: 28px; margin-bottom: 12px; }
+  p { font-size: 15px; opacity: 0.85; margin-bottom: 32px; line-height: 1.6; }
+  a.btn {
+    display: inline-block;
+    padding: 14px 40px;
+    background: #fff;
+    color: #764ba2;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: transform .15s, box-shadow .15s;
+  }
+  a.btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+  .note { margin-top: 24px; font-size: 12px; opacity: 0.6; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>一品多商</h1>
+    <p>智能商品匹配平台产品原型<br>点击下方按钮离线查看完整原型</p>
+    <a class="btn" href="dist/index.html">打开原型</a>
+    <div class="note">提示：原型为单页应用(SPA)，离线查看时部分路由跳转可能需要刷新页面</div>
+  </div>
+</body>
+</html>

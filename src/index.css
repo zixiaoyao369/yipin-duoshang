@@ -1,0 +1,231 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* === Apple-Inspired Design System === */
+    /* Adapted from Apple DESIGN.md for B2B enterprise context */
+
+    /* Background & Surface — Apple's light gray canvas */
+    --background: 240 5% 96%;        /* #f5f5f7 — Apple's signature light gray */
+    --foreground: 240 6% 10%;        /* #1d1d1f — Apple's near-black */
+    --card: 0 0% 100%;               /* Pure white cards */
+    --card-foreground: 240 6% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 6% 10%;
+
+    /* Primary — Apple Blue, the ONLY accent */
+    --primary: 211 100% 45%;         /* #0071e3 — Apple Blue */
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary — Subtle surface */
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 6% 10%;
+
+    /* Muted */
+    --muted: 240 5% 93%;
+    --muted-foreground: 240 4% 46%;  /* rgba(0,0,0,0.48) equivalent */
+
+    /* Accent — Light blue tint */
+    --accent: 211 100% 97%;
+    --accent-foreground: 211 100% 35%;
+
+    /* Destructive */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Status Colors — Refined, Apple-like subtlety */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --info: 211 100% 50%;
+    --info-foreground: 0 0% 100%;
+
+    /* Sidebar — Dark glass with Apple depth */
+    --sidebar: 0 0% 0%;              /* Pure black — Apple hero background */
+    --sidebar-foreground: 0 0% 70%;
+    --sidebar-accent: 211 100% 45%;  /* Apple Blue */
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 15%;
+
+    /* Border & Input — Near-invisible, Apple style */
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 211 100% 45%;
+    --radius: 0.75rem;               /* 12px — Apple's standard card radius */
+
+    /* Shadows — Apple's soft diffused studio shadow */
+    --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+    --shadow-card: 0 3px 20px 0 rgb(0 0 0 / 0.06);
+    --shadow-elevated: 3px 5px 30px 0 rgb(0 0 0 / 0.08);
+    --shadow-apple: 0 4px 24px 0 rgb(0 0 0 / 0.12);
+    --shadow-glow: 0 0 20px hsl(211 100% 45% / 0.15);
+
+    /* Transitions — Apple's buttery smooth */
+    --transition-smooth: all 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+    --transition-spring: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    --transition-apple: all 0.3s cubic-bezier(0.4, 0, 0, 1);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    letter-spacing: -0.022em; /* Apple's universal negative tracking */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Apple-style headline tracking */
+  h1, h2, h3 {
+    letter-spacing: -0.025em;
+  }
+
+  /* Scrollbar — Minimal, Apple-like */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgb(0 0 0 / 0.15);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(0 0 0 / 0.25);
+    background-clip: content-box;
+  }
+}
+
+@layer utilities {
+  /* Glass morphism — Apple's signature */
+  .glass {
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+  }
+
+  .glass-light {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+  }
+
+  .glass-dark {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+  }
+
+  /* Apple gradient utilities */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, hsl(211 100% 45%), hsl(211 100% 55%));
+  }
+
+  .bg-gradient-sidebar {
+    background: linear-gradient(180deg, #1a1a1c, #000000);
+  }
+
+  .bg-gradient-success {
+    background: linear-gradient(135deg, hsl(142 71% 45%), hsl(152 69% 50%));
+  }
+
+  .bg-gradient-warning {
+    background: linear-gradient(135deg, hsl(38 92% 50%), hsl(38 92% 60%));
+  }
+
+  .text-gradient-primary {
+    background: linear-gradient(135deg, hsl(211 100% 45%), hsl(211 100% 60%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Shadow utilities */
+  .shadow-subtle {
+    box-shadow: var(--shadow-subtle);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .shadow-apple {
+    box-shadow: var(--shadow-apple);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  /* Removed: shadow-elegant alias (replaced by shadow-card) */
+  .shadow-elegant {
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Transition utilities */
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  .transition-spring {
+    transition: var(--transition-spring);
+  }
+
+  .transition-apple {
+    transition: var(--transition-apple);
+  }
+
+  /* Animations — Apple-quality */
+  .animate-slide-in-right {
+    animation: slide-in-right 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  .animate-float-up {
+    animation: float-up 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+  @keyframes slide-in-right {
+    from { opacity: 0; transform: translateX(16px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes scale-in {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes float-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Animation delays for staggered effects */
+  .animate-delay-100 { animation-delay: 100ms; }
+  .animate-delay-200 { animation-delay: 200ms; }
+  .animate-delay-300 { animation-delay: 300ms; }
+  .animate-delay-400 { animation-delay: 400ms; }
+  .animate-delay-500 { animation-delay: 500ms; }
+}
