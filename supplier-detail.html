@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>商品详情 - 供应商平台</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f5f5; color: #333; }
+
+  /* 顶部导航 */
+  .header { background: #fff; border-bottom: 1px solid #eee; }
+  .header-top { background: #c0392b; color: #fff; padding: 8px 0; }
+  .header-top .inner { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+  .header-top .logo { font-size: 18px; font-weight: 700; letter-spacing: 1px; cursor: pointer; }
+  .header-top .logo span { font-size: 11px; font-weight: 400; opacity: 0.8; margin-left: 8px; }
+  .header-nav { max-width: 1200px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: center; gap: 20px; }
+  .breadcrumb { font-size: 12px; color: #999; }
+  .breadcrumb a { color: #999; text-decoration: none; }
+  .breadcrumb a:hover { color: #c0392b; }
+  .breadcrumb span { margin: 0 5px; }
+
+  /* 主体内容 */
+  .main { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+
+  /* 商品顶部信息区 */
+  .product-top { background: #fff; border-radius: 8px; padding: 24px; display: flex; gap: 30px; margin-bottom: 20px; }
+  .product-gallery { width: 350px; flex-shrink: 0; }
+  .main-img { width: 100%; height: 350px; border-radius: 8px; overflow: hidden; border: 1px solid #eee; display: flex; align-items: center; justify-content: center; background: #fafafa; }
+  .main-img img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .thumb-list { display: flex; gap: 8px; margin-top: 10px; }
+  .thumb { width: 60px; height: 60px; border-radius: 4px; border: 2px solid #eee; cursor: pointer; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #fafafa; }
+  .thumb.active { border-color: #c0392b; }
+  .thumb img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+  .product-info { flex: 1; }
+  .supplier-badge { display: inline-flex; align-items: center; gap: 6px; background: #fff3f0; border: 1px solid #ffc0b0; border-radius: 4px; padding: 4px 10px; font-size: 12px; color: #c0392b; margin-bottom: 12px; }
+  .supplier-badge .sup-icon { width: 20px; height: 20px; background: #c0392b; color: #fff; border-radius: 3px; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .product-title { font-size: 20px; font-weight: 600; line-height: 1.5; margin-bottom: 12px; color: #222; }
+  .product-sub { font-size: 13px; color: #888; margin-bottom: 16px; }
+  .price-box { background: #fff8f8; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .price-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+  .price-main { font-size: 32px; font-weight: 700; color: #c0392b; }
+  .price-unit { font-size: 14px; color: #999; }
+  .price-tax { font-size: 12px; color: #999; }
+  .price-range { font-size: 12px; color: #666; }
+  .price-range table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  .price-range td { padding: 4px 10px; border: 1px solid #eee; font-size: 12px; }
+  .price-range th { padding: 4px 10px; border: 1px solid #eee; font-size: 12px; background: #f9f9f9; font-weight: 500; }
+  .attrs { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid #eee; border-radius: 6px; overflow: hidden; margin-bottom: 16px; }
+  .attr-item { display: flex; padding: 8px 12px; border-bottom: 1px solid #eee; font-size: 13px; }
+  .attr-item:nth-last-child(-n+2) { border-bottom: none; }
+  .attr-label { color: #999; width: 80px; flex-shrink: 0; }
+  .attr-value { color: #333; font-weight: 500; }
+  .buy-actions { display: flex; gap: 10px; align-items: center; margin-top: 8px; }
+  .qty-box { display: flex; align-items: center; border: 1px solid #ddd; border-radius: 4px; overflow: hidden; }
+  .qty-btn { width: 30px; height: 36px; background: #f5f5f5; border: none; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+  .qty-input { width: 60px; height: 36px; text-align: center; border: none; border-left: 1px solid #ddd; border-right: 1px solid #ddd; font-size: 14px; outline: none; }
+  .btn-cart { padding: 0 28px; height: 40px; background: #fff3f0; border: 1px solid #c0392b; color: #c0392b; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: 500; }
+  .btn-buy-now { padding: 0 28px; height: 40px; background: #c0392b; color: #fff; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: 500; }
+  .btn-cart:hover { background: #ffe8e4; }
+  .btn-buy-now:hover { background: #a93226; }
+
+  /* 服务保障 */
+  .service-bar { display: flex; gap: 20px; border-top: 1px solid #f0f0f0; padding-top: 12px; margin-top: 12px; }
+  .service-item { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #666; }
+  .service-icon { color: #c0392b; font-size: 14px; }
+
+  /* 详情标签页 */
+  .detail-tabs { background: #fff; border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+  .tab-nav { display: flex; border-bottom: 1px solid #eee; }
+  .tab-btn { padding: 14px 24px; font-size: 14px; cursor: pointer; border: none; background: none; color: #666; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tab-btn.active { color: #c0392b; border-bottom-color: #c0392b; font-weight: 500; }
+  .tab-content { padding: 24px; display: none; }
+  .tab-content.active { display: block; }
+
+  /* 规格参数表 */
+  .spec-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .spec-table tr:nth-child(odd) td { background: #fafafa; }
+  .spec-table td { padding: 10px 16px; border: 1px solid #eee; }
+  .spec-table .spec-label { color: #666; width: 200px; }
+  .spec-table .spec-val { color: #333; font-weight: 500; }
+
+  /* 物流信息 */
+  .logistics-info { font-size: 13px; line-height: 2; color: #555; }
+  .logistics-info .l-row { display: flex; gap: 10px; margin-bottom: 8px; }
+  .logistics-info .l-label { color: #999; width: 80px; flex-shrink: 0; }
+
+  /* 供应商信息 */
+  .supplier-card { background: #f9f9f9; border-radius: 8px; padding: 20px; }
+  .supplier-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+  .supplier-logo { width: 60px; height: 60px; background: #c0392b; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; font-weight: 700; }
+  .supplier-name { font-size: 18px; font-weight: 600; }
+  .supplier-meta { font-size: 12px; color: #999; margin-top: 4px; }
+  .supplier-stats { display: flex; gap: 30px; }
+  .stat-item { text-align: center; }
+  .stat-num { font-size: 22px; font-weight: 700; color: #c0392b; }
+  .stat-label { font-size: 12px; color: #999; }
+
+  /* 右侧推荐 */
+  .page-layout { display: flex; gap: 20px; }
+  .main-col { flex: 1; min-width: 0; }
+  .side-col { width: 200px; flex-shrink: 0; }
+  .side-box { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .side-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #333; }
+  .side-product { display: flex; gap: 8px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
+  .side-product:last-child { border-bottom: none; }
+  .side-product:hover .side-pname { color: #c0392b; }
+  .side-pimg { width: 48px; height: 48px; border-radius: 4px; overflow: hidden; flex-shrink: 0; background: #f5f5f5; display: flex; align-items: center; justify-content: center; }
+  .side-pimg img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .side-pname { font-size: 12px; color: #555; line-height: 1.4; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .side-pprice { font-size: 13px; color: #c0392b; font-weight: 600; }
+
+  /* 返回按钮 */
+  .back-btn { display: inline-flex; align-items: center; gap: 6px; color: #666; font-size: 13px; cursor: pointer; padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; background: #fff; margin-bottom: 16px; }
+  .back-btn:hover { color: #c0392b; border-color: #c0392b; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="inner">
+      <div class="logo" onclick="goMall()">XX生物采购平台 <span>工业品自营商城</span></div>
+      <div style="font-size:12px;opacity:0.8;">欢迎您，采购员张三 &nbsp;|&nbsp; 我的订单 &nbsp;|&nbsp; 购物车(0)</div>
+    </div>
+  </div>
+  <div class="header-nav">
+    <button class="back-btn" onclick="goMall()">&#8592; 返回商品列表</button>
+    <div class="breadcrumb">
+      <a href="#" onclick="goMall()">首页</a>
+      <span>&gt;</span>
+      <a href="#" id="bread-cat">紧固件</a>
+      <span>&gt;</span>
+      <span id="bread-name">商品详情</span>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="page-layout">
+    <div class="main-col">
+      <!-- 商品顶部 -->
+      <div class="product-top">
+        <div class="product-gallery">
+          <div class="main-img">
+            <img id="main-img-el" src="" alt="商品图片">
+          </div>
+          <div class="thumb-list" id="thumb-list"></div>
+        </div>
+        <div class="product-info">
+          <div class="supplier-badge">
+            <div class="sup-icon" id="sup-icon-text">Z</div>
+            <span id="supplier-badge-name">ZKH震坤行</span>
+            <span style="color:#999">·</span>
+            <span id="supplier-badge-tag" style="color:#c0392b;">官方旗舰店</span>
+          </div>
+          <div class="product-title" id="product-title">六角螺栓 GB/T5782 M10×50 不锈钢304 全牙</div>
+          <div class="product-sub" id="product-sub">品牌：通用 &nbsp;|&nbsp; 货号：ZKH-BOLT-10050 &nbsp;|&nbsp; 已售：12,846件</div>
+          <div class="price-box">
+            <div class="price-row">
+              <div class="price-main" id="price-main">¥0.85</div>
+              <div class="price-unit" id="price-unit">/个</div>
+              <div class="price-tax">（含税）</div>
+            </div>
+            <div class="price-range">
+              <table>
+                <tr>
+                  <th>采购数量</th><th>单价</th>
+                </tr>
+                <tr><td id="qty1-range">1-99个</td><td id="qty1-price">¥0.85/个</td></tr>
+                <tr><td id="qty2-range">100-999个</td><td id="qty2-price">¥0.78/个</td></tr>
+                <tr><td id="qty3-range">1000个以上</td><td id="qty3-price">¥0.72/个</td></tr>
+              </table>
+            </div>
+          </div>
+          <div class="attrs" id="attrs-box"></div>
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;">
+            <span style="font-size:13px;color:#999;">数量</span>
+            <div class="qty-box">
+              <button class="qty-btn" onclick="changeQty(-1)">−</button>
+              <input class="qty-input" type="number" value="1" min="1" id="qty-input">
+              <button class="qty-btn" onclick="changeQty(1)">+</button>
+            </div>
+            <span style="font-size:12px;color:#999;">库存充足</span>
+          </div>
+          <div class="buy-actions">
+            <button class="btn-cart" onclick="alert('已加入购物车（模拟）')">加入购物车</button>
+            <button class="btn-buy-now" onclick="alert('正在跳转结算页面（模拟）')">立即采购</button>
+          </div>
+          <div class="service-bar">
+            <div class="service-item"><span class="service-icon">✓</span> 正品保障</div>
+            <div class="service-item"><span class="service-icon">✓</span> 7天退换</div>
+            <div class="service-item"><span class="service-icon">✓</span> 开具发票</div>
+            <div class="service-item"><span class="service-icon">✓</span> 次日达</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 详情标签页 -->
+      <div class="detail-tabs">
+        <div class="tab-nav">
+          <button class="tab-btn active" onclick="switchTab(this,'tab-spec')">规格参数</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-detail')">商品详情</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-logistics')">物流说明</button>
+          <button class="tab-btn" onclick="switchTab(this,'tab-supplier')">供应商信息</button>
+        </div>
+        <div class="tab-content active" id="tab-spec">
+          <table class="spec-table" id="spec-table"></table>
+        </div>
+        <div class="tab-content" id="tab-detail">
+          <div style="font-size:13px;color:#555;line-height:2;" id="product-desc"></div>
+        </div>
+        <div class="tab-content" id="tab-logistics">
+          <div class="logistics-info">
+            <div class="l-row"><span class="l-label">配送方式</span><span>自营快递，顺丰/京东物流</span></div>
+            <div class="l-row"><span class="l-label">发货时效</span><span id="delivery-time">下单后次日发货，部分仓库当日达</span></div>
+            <div class="l-row"><span class="l-label">运费说明</span><span>满199元免运费，不足收取12元运费</span></div>
+            <div class="l-row"><span class="l-label">退换货</span><span>支持7天无理由退换，需保持商品完好</span></div>
+            <div class="l-row"><span class="l-label">配送范围</span><span>全国配送，新疆西藏偏远地区需加收运费</span></div>
+          </div>
+        </div>
+        <div class="tab-content" id="tab-supplier">
+          <div class="supplier-card">
+            <div class="supplier-header">
+              <div class="supplier-logo" id="sup-logo">Z</div>
+              <div>
+                <div class="supplier-name" id="sup-name-full">ZKH震坤行工业品</div>
+                <div class="supplier-meta" id="sup-meta">成立于2012年 &nbsp;|&nbsp; 工业品综合平台 &nbsp;|&nbsp; 入驻3年</div>
+              </div>
+            </div>
+            <div class="supplier-stats">
+              <div class="stat-item"><div class="stat-num" id="stat-rating">98.6%</div><div class="stat-label">好评率</div></div>
+              <div class="stat-item"><div class="stat-num" id="stat-delivery">99.1%</div><div class="stat-label">按时发货</div></div>
+              <div class="stat-item"><div class="stat-num" id="stat-service">4.9</div><div class="stat-label">服务评分</div></div>
+              <div class="stat-item"><div class="stat-num" id="stat-products">50W+</div><div class="stat-label">在售SKU</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 侧边推荐 -->
+    <div class="side-col">
+      <div class="side-box">
+        <div class="side-title">同类推荐</div>
+        <div id="side-products"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 供应商数据
+const supplierData = {
+  zkh: {
+    name: "ZKH震坤行",
+    shortName: "ZKH",
+    icon: "Z",
+    tag: "官方旗舰店",
+    meta: "成立于2012年 | 工业品综合平台 | 入驻3年",
+    rating: "98.6%",
+    delivery: "99.1%",
+    service: "4.9",
+    products: "50W+",
+    color: "#e74c3c"
+  },
+  sh_jgj: {
+    name: "上海紧固件厂",
+    shortName: "沪固",
+    icon: "沪",
+    tag: "制造商直营",
+    meta: "成立于1988年 | 紧固件专业制造商 | 入驻2年",
+    rating: "96.2%",
+    delivery: "97.5%",
+    service: "4.7",
+    products: "2000+",
+    color: "#2980b9"
+  },
+  nj_bzj: {
+    name: "南京标准件厂",
+    shortName: "宁标",
+    icon: "宁",
+    tag: "制造商直营",
+    meta: "成立于1995年 | 标准件专业制造 | 入驻1年",
+    rating: "95.8%",
+    delivery: "96.3%",
+    service: "4.6",
+    products: "5000+",
+    color: "#27ae60"
+  },
+  nb_wj: {
+    name: "宁波五金贸易",
+    shortName: "甬金",
+    icon: "甬",
+    tag: "贸易商",
+    meta: "成立于2008年 | 五金紧固件经销 | 入驻2年",
+    rating: "94.1%",
+    delivery: "95.0%",
+    service: "4.5",
+    products: "8000+",
+    color: "#8e44ad"
+  },
+  hd_wj: {
+    name: "华东五金商贸",
+    shortName: "华东",
+    icon: "华",
+    tag: "区域经销商",
+    meta: "成立于2010年 | 华东地区主要经销商 | 入驻1年",
+    rating: "93.5%",
+    delivery: "94.2%",
+    service: "4.4",
+    products: "12000+",
+    color: "#e67e22"
+  },
+  bs_wj: {
+    name: "博仕五金",
+    shortName: "博仕",
+    icon: "博",
+    tag: "综合五金商",
+    meta: "成立于2015年 | 综合五金器材 | 入驻1年",
+    rating: "91.0%",
+    delivery: "92.5%",
+    service: "4.3",
+    products: "20000+",
+    color: "#16a085"
+  },
+  jg_jgj: {
+    name: "久固紧固件",
+    shortName: "久固",
+    icon: "久",
+    tag: "专业经销商",
+    meta: "成立于2005年 | 紧固件专业经销 | 入驻2年",
+    rating: "94.5%",
+    delivery: "95.8%",
+    service: "4.6",
+    products: "15000+",
+    color: "#2c3e50"
+  },
+  bzj_pf: {
+    name: "标准件批发城",
+    shortName: "批发城",
+    icon: "批",
+    tag: "批发商",
+    meta: "成立于2003年 | 大宗标准件批发 | 入驻1年",
+    rating: "90.5%",
+    delivery: "91.2%",
+    service: "4.2",
+    products: "30000+",
+    color: "#7f8c8d"
+  },
+  hl_wj: {
+    name: "华联五金商行",
+    shortName: "华联",
+    icon: "联",
+    tag: "五金专营",
+    meta: "成立于2007年 | 工业五金专营 | 入驻2年",
+    rating: "95.3%",
+    delivery: "96.0%",
+    service: "4.7",
+    products: "25000+",
+    color: "#1abc9c"
+  },
+  bzj_pf2: { name: "标准件批发", shortName: "标批", icon: "标", tag: "批发商", meta: "成立于2001年 | 工业标准件批发 | 入驻1年", rating: "89.8%", delivery: "90.5%", service: "4.1", products: "40000+", color: "#95a5a6" },
+  chint: { name: "正泰电器旗舰店", shortName: "正泰", icon: "正", tag: "制造商旗舰", meta: "成立于1984年 | 电气设备领军企业 | 入驻3年", rating: "99.2%", delivery: "99.5%", service: "5.0", products: "3000+", color: "#c0392b" },
+  dqc: { name: "电气城", shortName: "电城", icon: "电", tag: "电气专营", meta: "成立于2009年 | 工业电气设备 | 入驻2年", rating: "93.0%", delivery: "94.5%", service: "4.5", products: "18000+", color: "#2980b9" },
+  yd_cable: { name: "远东电缆", shortName: "远东", icon: "远", tag: "制造商直营", meta: "成立于1994年 | 国内领先电缆制造商 | 入驻2年", rating: "97.8%", delivery: "98.2%", service: "4.8", products: "800+", color: "#27ae60" },
+  jl_cable: { name: "金龙电线", shortName: "金龙", icon: "金", tag: "经销商", meta: "成立于2006年 | 线缆材料经销 | 入驻1年", rating: "92.5%", delivery: "93.8%", service: "4.4", products: "5000+", color: "#f39c12" },
+  ht_dg: { name: "鸿泰电工材料", shortName: "鸿泰", icon: "鸿", tag: "电工专营", meta: "成立于2011年 | 电工辅材专营 | 入驻1年", rating: "91.5%", delivery: "92.0%", service: "4.3", products: "8000+", color: "#8e44ad" },
+  "3m": { name: "3M安全旗舰店", shortName: "3M", icon: "3M", tag: "品牌旗舰", meta: "3M公司官方授权 | 全球安全防护领导者 | 入驻3年", rating: "99.5%", delivery: "99.8%", service: "5.0", products: "500+", color: "#c0392b" },
+  lb_ypc: { name: "劳保用品城", shortName: "劳保", icon: "劳", tag: "综合劳保", meta: "成立于2008年 | 劳动保护用品专营 | 入驻2年", rating: "93.8%", delivery: "94.5%", service: "4.5", products: "30000+", color: "#e67e22" },
+  cd_aqm: { name: "春达安全帽厂", shortName: "春达", icon: "春", tag: "制造商直营", meta: "成立于2002年 | 安全防护品制造 | 入驻1年", rating: "96.0%", delivery: "97.0%", service: "4.7", products: "200+", color: "#27ae60" },
+  aq_pf: { name: "安全用品批发", shortName: "安批", icon: "安", tag: "批发商", meta: "成立于2010年 | 安全用品批发零售 | 入驻1年", rating: "90.2%", delivery: "91.5%", service: "4.2", products: "15000+", color: "#7f8c8d" },
+  "3m_ind": { name: "3M工业", shortName: "3M工业", icon: "3M", tag: "品牌官方", meta: "3M工业事业部官方 | 工业磨料胶带专家 | 入驻3年", rating: "99.3%", delivery: "99.5%", service: "4.9", products: "1200+", color: "#c0392b" },
+  gl_fh: { name: "国联防护", shortName: "国联", icon: "国", tag: "防护专营", meta: "成立于2006年 | 劳动防护专营 | 入驻2年", rating: "92.0%", delivery: "93.0%", service: "4.4", products: "5000+", color: "#16a085" },
+  sh_fmf: { name: "上海阀门厂", shortName: "沪阀", icon: "沪", tag: "制造商直营", meta: "成立于1972年 | 老牌阀门制造商 | 入驻2年", rating: "97.5%", delivery: "98.0%", service: "4.8", products: "1500+", color: "#2c3e50" },
+  gd_wjc: { name: "管道五金城", shortName: "管城", icon: "管", tag: "管道专营", meta: "成立于2009年 | 管道五金配件 | 入驻1年", rating: "91.8%", delivery: "92.5%", service: "4.3", products: "20000+", color: "#e67e22" },
+  yy_fm: { name: "永一阀门", shortName: "永一", icon: "永", tag: "专业阀门商", meta: "成立于1999年 | 工业阀门专业经销 | 入驻2年", rating: "95.5%", delivery: "96.2%", service: "4.6", products: "8000+", color: "#2980b9" },
+  deli: { name: "得力旗舰店", shortName: "得力", icon: "得", tag: "品牌旗舰", meta: "得力集团官方旗舰 | 工具文具领导品牌 | 入驻3年", rating: "98.8%", delivery: "99.2%", service: "4.9", products: "5000+", color: "#e74c3c" },
+  gjc: { name: "工具城", shortName: "工城", icon: "工", tag: "五金工具专营", meta: "成立于2007年 | 工业工具专营 | 入驻2年", rating: "93.5%", delivery: "94.8%", service: "4.5", products: "40000+", color: "#2980b9" },
+  cg_oil: { name: "长城润滑油直营", shortName: "长城", icon: "城", tag: "制造商旗舰", meta: "中国长城润滑油官方 | 国内领先润滑品牌 | 入驻3年", rating: "99.0%", delivery: "99.3%", service: "4.9", products: "300+", color: "#c0392b" },
+  gy_rlc: { name: "工业润滑城", shortName: "润城", icon: "润", tag: "润滑品专营", meta: "成立于2008年 | 工业润滑品综合经销 | 入驻2年", rating: "92.8%", delivery: "93.5%", service: "4.4", products: "10000+", color: "#27ae60" },
+  shell: { name: "壳牌润滑油", shortName: "壳牌", icon: "壳", tag: "品牌直营", meta: "Shell中国授权旗舰 | 全球润滑油领导品牌 | 入驻2年", rating: "98.5%", delivery: "99.0%", service: "4.9", products: "400+", color: "#f39c12" },
+  xp_mjf: { name: "橡塑密封件厂", shortName: "橡塑", icon: "橡", tag: "制造商直营", meta: "成立于2000年 | 橡塑密封件专业制造 | 入驻2年", rating: "96.5%", delivery: "97.2%", service: "4.7", products: "2000+", color: "#16a085" },
+  mfj_pf: { name: "密封件批发", shortName: "密批", icon: "密", tag: "批发商", meta: "成立于2012年 | 密封件批发零售 | 入驻1年", rating: "90.8%", delivery: "91.5%", service: "4.2", products: "8000+", color: "#8e44ad" }
+};
+
+// 商品数据
+const productData = {
+  1: { name:"六角螺栓 GB/T5782 M10×50 不锈钢304 全牙", img:"images/bolt.png", unit:"个", cat:"紧固件",
+    specs: [["执行标准","GB/T5782"],["材质","不锈钢304"],["规格","M10×50mm"],["牙型","全牙"],["表面处理","本色"],["抗拉强度","≥500MPa"],["包装规格","50个/袋"],["产地","浙江"]],
+    desc: "本产品采用优质304不锈钢原材料，经精密冷镦工艺制造，具有优良的耐腐蚀性和机械性能。适用于化工、食品、医药等行业需要防腐蚀的紧固连接场合。螺纹精度高，配合性好，安装方便。通过ISO9001质量管理体系认证。",
+    price: 0.85, discount: [["1-99个","¥0.85/个"],["100-999个","¥0.78/个"],["1000个以上","¥0.72/个"]]
+  },
+  2: { name:"内六角螺钉 DIN912 M8×30 黑色发黑 12.9级高强度", img:"images/inner_hex.png", unit:"个", cat:"紧固件",
+    specs: [["执行标准","DIN912"],["强度等级","12.9级"],["材质","合金钢"],["规格","M8×30mm"],["表面处理","发黑处理"],["头型","圆柱头"],["扳手开口","6mm内六角"],["包装规格","100个/袋"]],
+    desc: "12.9级高强度内六角螺钉，采用优质合金钢制造，经过发黑防锈处理，具有极高的抗拉强度和剪切强度。广泛应用于机械、汽车、模具等精密机械连接场合，扭矩传递性能优异。",
+    price: 0.42, discount: [["1-99个","¥0.42/个"],["100-999个","¥0.38/个"],["1000个以上","¥0.35/个"]]
+  },
+  3: { name:"膨胀螺栓 M12×100 镀锌碳钢 外扩式重型", img:"images/expansion.png", unit:"套", cat:"紧固件",
+    specs: [["规格","M12×100mm"],["类型","外扩式重型膨胀螺栓"],["材质","碳钢镀锌"],["镀层","热浸锌"],["最大承载","800kg"],["孔径","15mm"],["包装规格","10套/包"],["适用基材","混凝土/砖墙"]],
+    desc: "重型膨胀螺栓，外扩式设计，安装牢固可靠，承重能力强。镀锌处理具有良好的防腐性能，适用于幕墙安装、设备固定、桥梁工程等重载场合。",
+    price: 1.20, discount: [["1-99套","¥1.20/套"],["100-499套","¥1.10/套"],["500套以上","¥0.98/套"]]
+  },
+  4: { name:"弹簧垫圈 GB93 M16 65Mn弹簧钢 热处理防松", img:"images/washer.png", unit:"个", cat:"紧固件",
+    specs: [["执行标准","GB93"],["规格","M16"],["材质","65Mn弹簧钢"],["热处理","淬火回火"],["硬度","HRC38-42"],["表面处理","磷化发黑"],["包装规格","200个/袋"],["弹力范围","优等品"]],
+    desc: "标准弹簧垫圈，采用65Mn弹簧钢制造，经淬火回火热处理，弹性好，防松效果优异。适用于振动或冲击载荷下的螺纹连接防松场合。",
+    price: 0.18, discount: [["1-199个","¥0.18/个"],["200-999个","¥0.16/个"],["1000个以上","¥0.14/个"]]
+  },
+  5: { name:"塑壳断路器 DZ47-63 C25 三极 小型断路器", img:"images/breaker.png", unit:"个", cat:"电气元件",
+    specs: [["型号","DZ47-63"],["额定电流","25A"],["极数","三极(3P)"],["脱扣特性","C型"],["额定电压","400V AC"],["分断能力","6000A"],["安装方式","35mm导轨"],["认证","CCC认证"]],
+    desc: "小型塑壳断路器，符合GB10963.1标准，具有过载和短路保护功能，C型脱扣特性适合一般工业负载保护，安装方便，性能稳定可靠。",
+    price: 18.50, discount: [["1-9个","¥18.50/个"],["10-49个","¥17.00/个"],["50个以上","¥15.50/个"]]
+  },
+  6: { name:"RVV电缆 3×2.5mm² 铜芯 100米", img:"images/cable.png", unit:"卷", cat:"电气元件",
+    specs: [["型号","RVV"],["规格","3×2.5mm²"],["导体材质","无氧铜"],["绝缘层","PVC"],["护套","PVC"],["卷长","100米"],["额定电压","300/500V"],["认证","3C认证"]],
+    desc: "三芯多股软电缆，铜芯导体，PVC绝缘及护套，弯曲性能好，适用于仪器、仪表、家用电器、动力装置的连接及控制线路用。",
+    price: 285.00, discount: [["1-4卷","¥285.00/卷"],["5-9卷","¥272.00/卷"],["10卷以上","¥258.00/卷"]]
+  },
+  7: { name:"PVC线槽 40×25mm 阻燃型 2米/根", img:"images/cable.png", unit:"根", cat:"电气元件",
+    specs: [["规格","40×25mm"],["材质","PVC工程料"],["阻燃等级","V-0"],["颜色","白色"],["长度","2米/根"],["壁厚","1.5mm"],["安装方式","螺钉固定"],["适用场所","室内"]],
+    desc: "阻燃PVC线槽，用于布线系统的导线保护，具有优良的阻燃性能，外观整洁美观，安装方便，广泛用于弱电工程、强电配电系统。",
+    price: 6.80, discount: [["1-19根","¥6.80/根"],["20-99根","¥6.20/根"],["100根以上","¥5.80/根"]]
+  },
+  8: { name:"乳胶手套 加厚耐磨型 L码 100只/盒", img:"images/gloves.png", unit:"盒", cat:"劳保用品",
+    specs: [["材质","天然乳胶"],["尺码","L码"],["数量","100只/盒"],["手型","五指型"],["表面处理","麻面防滑"],["厚度","0.12mm"],["适用场合","工业防护"],["认证","CE认证"]],
+    desc: "加厚型一次性乳胶手套，天然橡胶原料，弹性好，贴合性强。麻面防滑设计，提高抓握力。适用于化工、清洁、医疗辅助、实验室等场合的手部防护。",
+    price: 12.80, discount: [["1-9盒","¥12.80/盒"],["10-49盒","¥11.50/盒"],["50盒以上","¥10.20/盒"]]
+  },
+  9: { name:"安全帽 ABS材质 国标 建筑工地用 白色", img:"images/helmet.png", unit:"顶", cat:"劳保用品",
+    specs: [["材质","ABS工程塑料"],["颜色","白色"],["标准","GB2811-2019"],["帽型","T型"],["适用场所","建筑、矿山、化工"],["质量","≤430g"],["帽衬","HDPE帽衬"],["有效期","3年"]],
+    desc: "符合最新国家标准GB2811-2019的安全帽，采用高强度ABS材料制造，具有优良的冲击吸收性能和侧向刚性，有效保护头部安全。",
+    price: 28.50, discount: [["1-9顶","¥28.50/顶"],["10-49顶","¥26.00/顶"],["50顶以上","¥23.00/顶"]]
+  },
+  10: { name:"KN95防护口罩 带呼吸阀 独立包装 50只", img:"images/mask.png", unit:"盒", cat:"劳保用品",
+    specs: [["防护等级","KN95"],["过滤效率","≥95%"],["数量","50只/盒"],["呼吸阀","有呼吸阀"],["包装","独立包装"],["适用场合","粉尘、雾霾、花粉"],["认证","GB2626-2019"],["有效期","3年"]],
+    desc: "符合GB2626-2019标准的KN95防护口罩，过滤效率≥95%，带呼气阀设计降低呼吸阻力，独立包装卫生方便，适用于工业粉尘、有毒气体的防护。",
+    price: 45.00, discount: [["1-9盒","¥45.00/盒"],["10-49盒","¥42.00/盒"],["50盒以上","¥38.00/盒"]]
+  },
+  11: { name:"球阀 DN25 黄铜 全通径 PN16", img:"images/valve.png", unit:"个", cat:"管道配件",
+    specs: [["类型","全通径球阀"],["公称直径","DN25(1英寸)"],["材质","黄铜"],["压力等级","PN16"],["连接方式","内螺纹"],["介质温度","-20~120℃"],["密封材料","PTFE"],["适用介质","水/油/气"]],
+    desc: "优质黄铜球阀，全通径设计，流量大，阻力小。PTFE密封圈，密封性好，操作扭矩小，开关90°，使用方便。适用于水、油、气等介质的管路控制。",
+    price: 68.00, discount: [["1-4个","¥68.00/个"],["5-19个","¥62.00/个"],["20个以上","¥56.00/个"]]
+  },
+  12: { name:"截止阀 DN50 法兰连接 铸铁 PN16", img:"images/valve.png", unit:"个", cat:"管道配件",
+    specs: [["类型","截止阀"],["公称直径","DN50(2英寸)"],["材质","灰铸铁"],["压力等级","PN16"],["连接方式","法兰连接"],["介质温度","-10~200℃"],["密封","软密封"],["标准","GB/T15734"]],
+    desc: "铸铁法兰截止阀，密封可靠，调节性能好。适用于蒸汽、热水、油品等各种工业管道的截止和调节，密封面采用耐磨合金堆焊，使用寿命长。",
+    price: 145.00, discount: [["1-4个","¥145.00/个"],["5-9个","¥132.00/个"],["10个以上","¥120.00/个"]]
+  },
+  13: { name:"活动扳手 12寸 铬钒钢 重型工业级", img:"images/wrench.png", unit:"把", cat:"工具",
+    specs: [["规格","12英寸(300mm)"],["材质","铬钒钢(CrV)"],["开口范围","0-34mm"],["表面处理","镀铬抛光"],["认证","DIN3117"],["净重","约850g"],["产地","浙江"],["适用场合","工业级"]],
+    desc: "重型工业级活动扳手，铬钒钢精锻而成，强度高，耐磨损。镀铬防锈处理，外观精美。滚花精细调节螺母，操作灵活，卡口平整，牢固夹持各种螺母。",
+    price: 38.00, discount: [["1-4把","¥38.00/把"],["5-19把","¥35.00/把"],["20把以上","¥31.00/把"]]
+  },
+  14: { name:"工业胶带 绝缘电气胶带 PVC 19mm×10m 黑色", img:"images/cleaner.png", unit:"卷", cat:"工具",
+    specs: [["材质","PVC"],["宽度","19mm"],["长度","10m"],["颜色","黑色"],["绝缘性","600V"],["温度范围","-10~60℃"],["粘贴力","强力"],["认证","UL认证"]],
+    desc: "PVC绝缘电气胶带，优质聚氯乙烯薄膜，耐电压高达600V。耐油、耐水、耐紫外线，柔韧性好，拉伸后回弹性强，适用于电线接头包扎保护、束线固定等。",
+    price: 22.00, discount: [["1-9卷","¥22.00/卷"],["10-49卷","¥20.00/卷"],["50卷以上","¥17.50/卷"]]
+  },
+  15: { name:"工业润滑油 L-AN46 普通机械油 18L桶", img:"images/oil.png", unit:"桶", cat:"化工耗材",
+    specs: [["牌号","L-AN46"],["粘度等级","ISO VG 46"],["容量","18升"],["用途","普通机械润滑"],["颜色","淡黄色"],["倾点","≤-10℃"],["闪点","≥160℃"],["执行标准","GB/T7631"]],
+    desc: "工业普通机械油，由优质基础油精制而成，加有适量抗氧化添加剂，具有良好的润滑性能。适用于低速重载、中速中载的普通工业齿轮箱、轴承等机械设备润滑。",
+    price: 168.00, discount: [["1-3桶","¥168.00/桶"],["4-9桶","¥155.00/桶"],["10桶以上","¥142.00/桶"]]
+  },
+  16: { name:"工业用液压油 HM46 抗磨型 200L大桶", img:"images/oil.png", unit:"桶", cat:"化工耗材",
+    specs: [["型号","HM46抗磨液压油"],["粘度等级","ISO VG 46"],["容量","200升"],["粘度指数","≥95"],["倾点","≤-12℃"],["闪点","≥195℃"],["抗磨性","优秀"],["执行标准","GB11118.1"]],
+    desc: "高性能抗磨液压油，含有高效抗磨添加剂，具有优良的抗磨、防锈和抗氧化性能。适用于各类液压系统，尤其是对液压系统的泵、阀、马达等精密元件具有良好的保护作用。",
+    price: 320.00, discount: [["1桶","¥320.00/桶"],["2-4桶","¥305.00/桶"],["5桶以上","¥285.00/桶"]]
+  },
+  17: { name:"O型密封圈 NBR橡胶 50件套 通用型", img:"images/oring.png", unit:"套", cat:"化工耗材",
+    specs: [["材质","NBR丁腈橡胶"],["硬度","Shore A 70°"],["数量","50件/套"],["颜色","黑色"],["温度范围","-30~120℃"],["耐介质","油、水、气"],["规格","多种混合"],["认证","RoHS认证"]],
+    desc: "NBR丁腈橡胶O型密封圈套装，50件多种规格混合，耐油性好，适用于各种液压、气动设备的静态和动态密封。具有优良的耐磨性和弹性恢复性。",
+    price: 0.65, discount: [["1-99个","¥0.65/个"],["100-499个","¥0.58/个"],["500个以上","¥0.52/个"]]
+  },
+  18: { name:"工业清洗剂 多功能去油除锈 5L装", img:"images/cleaner.png", unit:"桶", cat:"化工耗材",
+    specs: [["类型","多功能工业清洗剂"],["容量","5升"],["主要成分","表面活性剂复配"],["PH值","7-9(弱碱性)"],["使用方式","直接用或稀释"],["适用材质","金属/塑料"],["气味","低气味"],["认证","环保型"]],
+    desc: "多功能工业清洗剂，可有效去除油脂、锈迹、积碳、抛光膏等各种污垢。弱碱性配方，对金属无腐蚀，可直接使用或按比例稀释。适用于工业设备、模具、零件的清洗维护。",
+    price: 68.00, discount: [["1-4桶","¥68.00/桶"],["5-19桶","¥62.00/桶"],["20桶以上","¥55.00/桶"]]
+  }
+};
+
+// 解析URL参数
+function getUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  return { s: params.get('s') || 'zkh', pid: parseInt(params.get('pid')) || 1 };
+}
+
+function goMall() {
+  window.location.href = 'mall.html';
+}
+
+function switchTab(btn, tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+
+function changeQty(delta) {
+  const input = document.getElementById('qty-input');
+  const val = Math.max(1, parseInt(input.value || 1) + delta);
+  input.value = val;
+}
+
+function init() {
+  const { s, pid } = getUrlParams();
+  const sup = supplierData[s] || supplierData['zkh'];
+  const prod = productData[pid] || productData[1];
+
+  // 设置标题
+  document.title = prod.name + ' - ' + sup.name;
+
+  // 面包屑
+  document.getElementById('bread-cat').textContent = prod.cat;
+  document.getElementById('bread-name').textContent = prod.name.substring(0, 20) + '...';
+
+  // 主图
+  document.getElementById('main-img-el').src = prod.img;
+  document.getElementById('main-img-el').alt = prod.name;
+
+  // 缩略图（模拟多角度，实际用同一图片）
+  const thumbList = document.getElementById('thumb-list');
+  for (let i = 0; i < 4; i++) {
+    const t = document.createElement('div');
+    t.className = 'thumb' + (i === 0 ? ' active' : '');
+    t.innerHTML = `<img src="${prod.img}" alt="">`;
+    t.onclick = function() {
+      document.querySelectorAll('.thumb').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+    };
+    thumbList.appendChild(t);
+  }
+
+  // 供应商徽章
+  document.getElementById('sup-icon-text').textContent = sup.icon;
+  document.getElementById('supplier-badge-name').textContent = sup.name;
+  document.getElementById('supplier-badge-tag').textContent = sup.tag;
+  const supIcon = document.getElementById('sup-icon-text');
+  supIcon.style.background = sup.color || '#c0392b';
+
+  // 商品标题
+  document.getElementById('product-title').textContent = prod.name;
+  document.getElementById('product-sub').innerHTML =
+    `品牌：通用 &nbsp;|&nbsp; 货号：${sup.shortName}-${pid.toString().padStart(4,'0')} &nbsp;|&nbsp; 已售：${(Math.floor(Math.random()*50)+5)*100}件`;
+
+  // 价格
+  document.getElementById('price-main').textContent = '¥' + prod.price.toFixed(2);
+  document.getElementById('price-unit').textContent = '/' + prod.unit;
+
+  // 阶梯价
+  const disc = prod.discount;
+  if (disc) {
+    const keys = ['qty1', 'qty2', 'qty3'];
+    disc.forEach((d, i) => {
+      if (keys[i]) {
+        const ri = document.getElementById(keys[i]+'-range');
+        const pi = document.getElementById(keys[i]+'-price');
+        if (ri) ri.textContent = d[0];
+        if (pi) pi.textContent = d[1];
+      }
+    });
+  }
+
+  // 属性
+  const attrsBox = document.getElementById('attrs-box');
+  prod.specs.slice(0, 8).forEach(([k, v]) => {
+    const item = document.createElement('div');
+    item.className = 'attr-item';
+    item.innerHTML = `<span class="attr-label">${k}</span><span class="attr-value">${v}</span>`;
+    attrsBox.appendChild(item);
+  });
+
+  // 规格参数
+  const specTable = document.getElementById('spec-table');
+  prod.specs.forEach(([k, v]) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="spec-label">${k}</td><td class="spec-val">${v}</td>`;
+    specTable.appendChild(tr);
+  });
+
+  // 商品描述
+  document.getElementById('product-desc').innerHTML =
+    `<p><strong>${prod.name}</strong></p><br><p>${prod.desc}</p>
+     <br><p style="color:#999;font-size:12px;">注：本页面为演示页面，商品信息仅供参考。</p>`;
+
+  // 物流信息
+  const deliveryTime = s === 'zkh' ? '下单当日发货，次日达（部分地区）' : '下单后2-5个工作日内发货';
+  document.getElementById('delivery-time').textContent = deliveryTime;
+
+  // 供应商信息
+  document.getElementById('sup-logo').textContent = sup.icon;
+  document.getElementById('sup-logo').style.background = sup.color || '#c0392b';
+  document.getElementById('sup-name-full').textContent = sup.name;
+  document.getElementById('sup-meta').textContent = sup.meta;
+  document.getElementById('stat-rating').textContent = sup.rating;
+  document.getElementById('stat-delivery').textContent = sup.delivery;
+  document.getElementById('stat-service').textContent = sup.service;
+  document.getElementById('stat-products').textContent = sup.products;
+
+  // 侧边推荐（随机选3个其他商品）
+  const sideEl = document.getElementById('side-products');
+  const ids = Object.keys(productData).map(Number).filter(i => i !== pid);
+  const shuffled = ids.sort(() => Math.random() - 0.5).slice(0, 5);
+  shuffled.forEach(id => {
+    const p = productData[id];
+    const div = document.createElement('div');
+    div.className = 'side-product';
+    div.innerHTML = `
+      <div class="side-pimg"><img src="${p.img}" alt="${p.name}"></div>
+      <div>
+        <div class="side-pname">${p.name}</div>
+        <div class="side-pprice">¥${p.suppliers ? p.suppliers[0]?.price?.toFixed(2) : p.price.toFixed(2)}</div>
+      </div>`;
+    div.onclick = () => { window.location.href = `supplier-detail.html?s=${s}&pid=${id}`; };
+    sideEl.appendChild(div);
+  });
+}
+
+init();
+</script>
+</body>
+</html>
